@@ -1,8 +1,8 @@
 var cors = require('cors');
 const express = require('express')
-import { NextFunction, Request } from 'express';
-import * as TasksController from './controllers/tasks';
 
+import { errorMiddleware } from './middlewares/error';
+import * as TasksController from './controllers/tasks';
 
 const app = express()
 
@@ -15,9 +15,7 @@ app.post('/task', TasksController.createTask)
 app.delete('/task/:id', TasksController.deleteTask)
 app.put('/task/:id', TasksController.updateTask)
 
-app.use((error: Error, request: Request, response: Response, next: NextFunction) => {
-    
-})
+app.use(errorMiddleware)
 
 app.listen("9990", () => {
     console.log("running in http://localhost:9990 !");
