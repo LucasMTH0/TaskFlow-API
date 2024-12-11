@@ -1,22 +1,16 @@
-var cors = require('cors');
-const express = require('express')
-
 import { errorMiddleware } from './middlewares/error';
-import * as TasksController from './controllers/tasks';
+import { taskRouter } from './routes/TaskRouter';
+import { userRouter } from './routes/UserRouter';
+const PORT = 9990
+const express = require('express');
+var cors = require('cors');
+const app = express();
 
-const app = express()
-
-app.use(cors())
+app.use(errorMiddleware);
 app.use(express.json());
+app.use(cors())
 
-app.get('/tasks', TasksController.getAllTasks)
-app.get('/task/:id', TasksController.getUniqueTask)
-app.post('/task', TasksController.createTask)
-app.delete('/task/:id', TasksController.deleteTask)
-app.put('/task/:id', TasksController.updateTask)
+app.use(taskRouter);
+app.use(userRouter);
 
-app.use(errorMiddleware)
-
-app.listen("9990", () => {
-    console.log("running in http://localhost:9990 !");
-})
+app.listen(PORT, () => {console.log(`running in http://localhost:${PORT} !`)})
