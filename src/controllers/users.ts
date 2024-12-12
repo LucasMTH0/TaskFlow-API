@@ -21,19 +21,6 @@ export async function createUser(request: Request, response: Response) {
     })
 }
 
-function isEmailExists(email: string){
-    const query: string = "SELECT * FROM users WHERE email = ?"
-    const value: string[] = [email]
-    return database.get(query, value, (getUserByEmailError: Error, user: User[]) => {
-        if(getUserByEmailError && user.length == 0){
-
-            throw new ApiError("Erro ao encontrar o usuário", 404)
-        } else {
-            return user;
-        }
-    })
-}
-
 export async function getUser(request: Request, response: Response){
     const {email, password} = request.params
     const query: string = "SELECT * FROM users WHERE email = ?";
@@ -70,13 +57,29 @@ export function deleteUser(request: Request, response: Response){
 }
 
 export function updateUser(request: Request, response: Response){
-    const {body, params} = request
-    const query: string = "UPDATE tasks SET email = ?, name = ?, password = ? WHERE id = ?";
-    const values: string[] = [body.email, body.name, body.password, params.id]
+    const { email, name, id } = request.body
+    const query: string = "UPDATE users SET email = ?, name = ? WHERE id = ?";
+    const values: string[] = [email, name, id]
     database.run(query, values, (updateUserError: Error) => {
         if(updateUserError){
+            return response.status(400).send({ error: "Erro ao cadastrar", details: updateUserError.message });
             throw new ApiError("Erro ao atualizar o usuário", 404)
         }
-        return response.status(200).send("Usuário editado!");
+        return response.status(200).json("Usuário editado!");
+    })
+}
+
+export async function updatePassword(request: Request, response: Response){
+    const { password, id } = request.body
+    const encryptedPassword = await generateEncryptPassord(password)
+
+    const query: string = "UPDATE users SET password = ? WHERE id = ?";
+    const values: string[] = [encryptedPassword,  id]
+    database.run(query, values, (updatePasswordError: Error) => {
+        if(updatePasswordError){
+            return response.status(400).send({ error: "Erro ao cadastrar", details: updatePasswordError.message });
+            throw new ApiError("Erro ao atualizar o usuário", 404)
+        }
+        return response.status(200).json("Usuário editado!");
     })
 }

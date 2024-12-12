@@ -6,6 +6,7 @@ const userRouter = Router()
 userRouter.get('/user/:email/:password', UserController.getUser);
 userRouter.post('/user', UserController.createUser);
 userRouter.put('/user/:id', UserController.updateUser);
+userRouter.put('/user/pass/:id', UserController.updatePassword);
 userRouter.delete('/user/:id', UserController.deleteUser);
 
 export { userRouter }
